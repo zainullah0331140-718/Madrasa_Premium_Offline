@@ -1,0 +1,23 @@
+{% extends 'base.html' %}{% import '_m.html' as m %}
+{% block title %}بقایا جات{% endblock %}
+{% block page_title %}بقایا فیس / ڈیفالٹرز{% endblock %}
+{% block content %}
+<section class="card">
+  <h3 class="card-title">{{ m.icon('warn') }} {{ month }} {{ year }} — بقایا ماہانہ فیس<span class="tools"><button class="btn btn-sm" type="button" data-print>{{ m.icon('print') }} پرنٹ</button></span></h3>
+  <form class="filters" method="get">
+    {{ m.month_select('month', month, blank='') }}{{ m.field('سال', 'year', year, type='number', cls='') }}{{ m.class_filter(classes, class_name) }}
+    <button class="btn btn-dark">{{ m.icon('search') }} دکھائیں</button>
+  </form>
+  <div class="grid g3">
+    {{ m.kpi('مقررہ فیس', total_expected|money, 'wallet', 'grey', '', st.currency) }}
+    {{ m.kpi('وصول شدہ', total_paid|money, 'check', 'green', '', st.currency) }}
+    {{ m.kpi('بقایا', total_due|money, 'warn', 'red', '', st.currency) }}
+  </div>
+  {% if unset %}<div class="note-info mb">{{ unset }} طلبہ کی ماہانہ فیس مقرر نہیں۔ <a href="/classes">کلاسوں</a> میں ماہانہ فیس درج کریں تاکہ بقایا خود بخود نکلے۔</div>{% endif %}
+  <div class="table-wrap"><table><thead><tr><th>رول</th><th>طالب علم</th><th>ولدیت</th><th>درجہ</th><th>رابطہ</th><th class="num">مقررہ</th><th class="num">ادا</th><th class="num">بقایا</th><th class="no-print"></th></tr></thead><tbody>
+  {% for r in rows %}<tr><td class="num">{{ r.roll_number or '—' }}</td><td><b>{{ r.name }}</b></td><td>{{ r.father_name or '—' }}</td><td>{{ r.admission_class }}</td><td class="num">{{ r.guardian_phone or r.phone or '—' }}</td>
+    <td class="num">{{ r.expected|money }}</td><td class="num">{{ r.paid|money }}</td><td class="num"><span class="chip red">{{ r.due|money }}</span></td>
+    <td class="actions no-print"><a class="btn btn-sm btn-primary" href="/fees">وصولی</a></td></tr>
+  {% else %}{{ m.empty_row(9, 'ماشاء اللہ — کوئی بقایا نہیں') }}{% endfor %}</tbody></table></div>
+</section>
+{% endblock %}

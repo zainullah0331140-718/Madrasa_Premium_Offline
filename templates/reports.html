@@ -1,0 +1,27 @@
+{% extends 'base.html' %}{% import '_m.html' as m %}
+{% block title %}جامع رپورٹس{% endblock %}
+{% block page_title %}جامع رپورٹ، گریڈ اور پوزیشن{% endblock %}
+{% block content %}
+<section class="card">
+  <h3 class="card-title">{{ m.icon('chart') }} رپورٹ فلٹر<span class="tools"><a class="btn btn-sm" href="/fees/defaulters">بقایا فیس</a><a class="btn btn-sm" href="/finance">آمدن و خرچ</a></span></h3>
+  <form class="filters" method="get">
+    {{ m.class_filter(classes, class_name) }}
+    <div class="fld"><label>امتحان</label><select name="exam"><option value="">تمام امتحانات</option>{% for e in exams %}<option{% if e==exam %} selected{% endif %}>{{ e }}</option>{% endfor %}</select></div>
+    {{ m.field('حاضری کا مہینہ (اختیاری)', 'month', month, type='month', cls='') }}
+    <button class="btn btn-dark">{{ m.icon('search') }} رپورٹ دیکھیں</button>
+    <button type="button" class="btn" data-print>{{ m.icon('print') }} پرنٹ</button>
+    <a class="btn" href="/reports/export.csv?class_name={{ class_name|urlencode }}&month={{ month }}&exam={{ exam|urlencode }}">{{ m.icon('download') }} Excel/CSV</a>
+  </form>
+  {% if grades %}<div class="flex wrap gap mb">{% for g, n in grades.items()|sort %}<span>{{ m.grade_chip(g) }} × {{ n }}</span>{% endfor %}</div>{% endif %}
+  <div class="table-wrap"><table><thead><tr><th class="num">پوزیشن</th><th class="num">رول</th><th>طالب علم</th><th>ولدیت</th><th>کلاس</th><th class="num">حاصل</th><th class="num">کل</th><th class="num">فیصد</th><th>گریڈ</th><th class="num">حاضری</th></tr></thead><tbody>
+  {% for s in students %}<tr><td class="num">{% if s.position %}<span class="chip {{ 'yellow' if s.position <= 3 }}">{{ s.position }}</span>{% else %}—{% endif %}</td><td class="num">{{ s.roll_number or s.id }}</td>
+    <td><a href="/students/{{ s.id }}"><b>{{ s.name }}</b></a></td><td>{{ s.father_name or '—' }}</td><td>{{ s.admission_class }}</td>
+    <td class="num">{{ s.obtained }}</td><td class="num">{{ s.total }}</td><td class="num">{{ s.percent|pctfmt }}%</td><td>{{ m.grade_chip(s.grade) if s.total else '—' }}</td><td class="num">{{ s.att_pct|pctfmt }}%</td></tr>
+  {% else %}{{ m.empty_row(10, 'ریکارڈ موجود نہیں') }}{% endfor %}</tbody></table></div>
+</section>
+<section class="card">
+  <h3 class="card-title">{{ m.icon('cap') }} پوزیشن ہولڈرز (ہر کلاس کے پہلے 3)</h3>
+  <div class="grid g3">{% for p in toppers %}<div class="medal"><span class="pos">{{ p.position }}</span><div><b>{{ p.name }}</b><div class="muted small">{{ p.admission_class }} · {{ p.percent|pctfmt }}% · گریڈ {{ p.grade }}</div></div></div>
+  {% else %}<p class="muted">نتائج درج ہونے کے بعد پوزیشن یہاں نظر آئے گی۔</p>{% endfor %}</div>
+</section>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends 'base.html' %}{% import '_m.html' as m %}
+{% block title %}کلاسیں{% endblock %}
+{% block page_title %}کلاسوں کا انتظام{% endblock %}
+{% block content %}
+<section class="card">
+  <h3 class="card-title">{{ m.icon('plus') }} کلاس شامل کریں یا اپڈیٹ کریں</h3>
+  <form method="post" action="/classes/save" class="form-grid">
+    {{ m.field('کلاس کا نام', 'name', required=True, cls='c-3', placeholder='مثلاً: درجہ اول') }}
+    <div class="fld c-3"><label>کلاس ٹیچر</label><select name="teacher_id"><option value="">منتخب کریں</option>{% for t in teachers %}<option value="{{ t.id }}">{{ t.name }}</option>{% endfor %}</select></div>
+    {{ m.field('ماہانہ فیس', 'monthly_fee', type='number', cls='c-3') }}{{ m.field('تفصیل', 'description', cls='c-3') }}
+    <div class="c-12"><button class="btn btn-primary">{{ m.icon('check') }} محفوظ کریں</button> <span class="hint">پہلے سے موجود نام لکھنے پر اس کی معلومات اپڈیٹ ہو جائیں گی۔</span></div>
+  </form>
+</section>
+<section class="card">
+  <h3 class="card-title">{{ m.icon('layers') }} کلاسوں کی فہرست</h3>
+  <div class="table-wrap"><table><thead><tr><th>کلاس</th><th>کلاس ٹیچر</th><th class="num">طلبہ</th><th class="num">ماہانہ فیس</th><th></th></tr></thead><tbody>
+  {% for c in classes %}<tr><td><b>{{ c.name }}</b> <span class="muted small">{{ c.description or '' }}</span></td><td>{{ c.teacher_name or 'متعین نہیں' }}</td><td class="num">{{ c.n }}</td><td class="num">{{ (c.monthly_fee or 0)|money }}</td>
+    <td class="actions"><a class="btn btn-sm" href="/students?class_name={{ c.name|urlencode }}">طلبہ</a> <a class="btn btn-sm" target="_blank" href="/classes/print?name={{ c.name|urlencode }}">{{ m.icon('print') }} رپورٹ</a> <a class="btn btn-sm" target="_blank" href="/students/cards?class_name={{ c.name|urlencode }}">کارڈ</a>
+    {{ m.del_form('/classes/' ~ c.id ~ '/delete', 'کلاس کی ترتیب حذف کریں؟ طلبہ کا ریکارڈ محفوظ رہے گا۔') }}</td></tr>
+  {% endfor %}
+  {% for c in implicit %}<tr><td><b>{{ c.name }}</b> <span class="chip">داخلے سے</span></td><td>متعین نہیں</td><td class="num">{{ c.n }}</td><td class="num">0</td>
+    <td class="actions"><a class="btn btn-sm" href="/students?class_name={{ c.name|urlencode }}">طلبہ</a> <a class="btn btn-sm" target="_blank" href="/classes/print?name={{ c.name|urlencode }}">رپورٹ</a></td></tr>{% endfor %}
+  {% if not classes and not implicit %}{{ m.empty_row(5, 'ابھی کوئی کلاس نہیں') }}{% endif %}</tbody></table></div>
+  <div class="note-info mt-s">"داخلے سے" والی کلاسیں طلبہ کے داخلے میں لکھے گئے درجے سے خود بنی ہیں۔ فیس اور ٹیچر مقرر کرنے کے لیے اوپر اسی نام سے محفوظ کریں۔</div>
+</section>
+{% endblock %}

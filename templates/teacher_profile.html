@@ -1,0 +1,38 @@
+{% extends 'base.html' %}{% import '_m.html' as m %}
+{% block title %}{{ t.name }}{% endblock %}
+{% block page_title %}استاد کا پروفائل{% endblock %}
+{% block content %}
+<section class="card">
+  <div class="profile-head">
+    <span class="avatar lg">{{ t.name[:1] }}</span>
+    <div class="grow"><h2 style="margin:0">{{ t.name }}</h2><p><span class="chip yellow">{{ t.subject or 'مضمون درج نہیں' }}</span>
+      {% for c in classes %}<span class="chip">{{ c.name }}</span> {% endfor %}</p></div>
+    <div class="flex wrap gap"><a class="btn btn-primary" href="/teachers/{{ t.id }}/edit">{{ m.icon('edit') }} ترمیم</a>
+      {{ m.del_form('/teachers/' ~ t.id ~ '/delete', 'کیا ' ~ t.name ~ ' کو حذف کرنا ہے؟') }}</div>
+  </div><hr>
+  <dl class="kv">
+    <div><dt>فون</dt><dd class="num">{{ t.phone or '—' }}</dd></div><div><dt>تعلیمی قابلیت</dt><dd>{{ t.qualification or '—' }}</dd></div>
+    <div><dt>تاریخ تقرری</dt><dd class="num">{{ t.joining_date or '—' }}</dd></div><div><dt>ماہانہ تنخواہ</dt><dd>{{ t.salary|money }} {{ st.currency }}</dd></div>
+    <div><dt>شناختی کارڈ</dt><dd class="num">{{ t.cnic or '—' }}</dd></div><div><dt>پتہ</dt><dd>{{ t.address or '—' }}</dd></div>
+  </dl>
+</section>
+<div class="grid g3">
+  {{ m.kpi('اس ماہ حاضر', att.get('حاضر', 0), 'check', 'green') }}
+  {{ m.kpi('اس ماہ غیر حاضر', att.get('غیر حاضر', 0), 'warn', 'red') }}
+  {{ m.kpi('چھٹی / تاخیر', att.get('چھٹی', 0) ~ ' / ' ~ att.get('تاخیر', 0), 'users', 'grey') }}
+</div>
+<div class="grid g-main">
+<section class="card"><h3 class="card-title">{{ m.icon('receipt') }} تنخواہ کی ادائیگیاں</h3>
+  <div class="table-wrap"><table><thead><tr><th>مہینہ</th><th>تاریخ</th><th class="num">رقم</th><th>نوٹ</th><th class="no-print"></th></tr></thead><tbody>
+  {% for r in salaries %}<tr><td>{{ r.month }} {{ r.year }}</td><td class="num">{{ r.paid_date }}</td><td class="num"><b>{{ r.amount|money }}</b></td><td>{{ r.note or '—' }}</td>
+    <td class="actions"><a class="btn btn-sm" target="_blank" href="/salary/{{ r.id }}/slip">سلپ</a> {{ m.del_form('/salary/' ~ r.id ~ '/delete', 'یہ تنخواہ کا اندراج حذف کریں؟') }}</td></tr>
+  {% else %}{{ m.empty_row(5, 'ابھی کوئی ادائیگی درج نہیں') }}{% endfor %}</tbody></table></div></section>
+<section class="card"><h3 class="card-title">{{ m.icon('plus') }} تنخواہ ادا کریں</h3>
+  <form method="post" action="/teachers/{{ t.id }}/salary" class="form-grid">
+    {{ m.select('مہینہ', 'month', MONTHS, cur_month, cls='c-6') }}{{ m.field('سال', 'year', cur_year, type='number', cls='c-6') }}
+    {{ m.field('رقم', 'amount', t.salary, type='number', cls='c-6', required=True) }}{{ m.field('تاریخ ادائیگی', 'paid_date', today, type='date', cls='c-6') }}
+    {{ m.field('نوٹ (اختیاری)', 'note', cls='c-12') }}
+    <div class="c-12"><button class="btn btn-primary btn-block">ادائیگی درج کریں</button></div>
+  </form></section>
+</div>
+{% endblock %}

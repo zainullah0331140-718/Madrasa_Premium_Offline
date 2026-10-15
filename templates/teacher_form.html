@@ -1,0 +1,15 @@
+{% extends 'base.html' %}{% import '_m.html' as m %}
+{% block title %}استاد کی ترمیم{% endblock %}
+{% block page_title %}استاد کی ترمیم{% endblock %}
+{% block content %}
+<form class="card" method="post" action="/teachers/{{ t.id }}/edit">
+  <h3 class="card-title">{{ m.icon('edit') }} {{ t.name }}</h3>
+  <div class="form-grid">
+    {{ m.field('نام', 'name', t.name, required=True, cls='c-4') }}{{ m.field('مضمون', 'subject', t.subject, cls='c-4') }}{{ m.field('فون نمبر', 'phone', t.phone, type='tel', cls='c-4') }}
+    {{ m.field('ماہانہ تنخواہ', 'salary', t.salary, type='number', cls='c-3') }}{{ m.field('تعلیمی قابلیت', 'qualification', t.qualification, cls='c-3') }}
+    {{ m.field('تاریخ تقرری', 'joining_date', t.joining_date, type='date', cls='c-3') }}{{ m.field('شناختی کارڈ نمبر', 'cnic', t.cnic, cls='c-3') }}
+    {{ m.field('پتہ', 'address', t.address, cls='c-12') }}
+    <div class="c-12 flex gap"><button class="btn btn-primary btn-lg">{{ m.icon('check') }} محفوظ کریں</button><a class="btn btn-lg" href="/teachers/{{ t.id }}">منسوخ</a></div>
+  </div>
+</form>
+{% endblock %}

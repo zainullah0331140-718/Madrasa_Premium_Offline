@@ -1,0 +1,11 @@
+{% extends 'print_base.html' %}{% import '_m.html' as m %}
+{% block title %}تنخواہ سلپ{% endblock %}
+{% block sheet %}<div class="sheet receipt">
+  {{ m.letterhead(school) }}
+  <div class="doc-title">تنخواہ سلپ</div>
+  <table><tr><th>سلپ نمبر</th><td>S-{{ r.id }}</td><th>تاریخ</th><td>{{ r.paid_date }}</td></tr>
+  <tr><th>استاد</th><td>{{ r.teacher_name }}</td><th>مضمون</th><td>{{ r.subject or '—' }}</td></tr>
+  <tr><th>برائے ماہ</th><td>{{ r.month }} {{ r.year }}</td><th>نوٹ</th><td>{{ r.note or '—' }}</td></tr></table>
+  <p class="center mt"><span class="amount-box">{{ r.amount|money }} {{ st.currency }}</span></p>
+  <div class="sig"><div>دستخط وصول کنندہ</div><div>{{ st.principal or 'مہتمم / پرنسپل' }}</div></div>
+</div>{% endblock %}

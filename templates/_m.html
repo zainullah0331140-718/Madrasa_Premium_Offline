@@ -1,0 +1,36 @@
+{# Shared macros #}
+{% macro icon(name) %}<svg class="ic" aria-hidden="true"><use href="#i-{{ name }}"/></svg>{% endmacro %}
+
+{% macro field(label, name, value='', type='text', required=False, cls='c-6', placeholder='', list='', extra='') %}
+<div class="fld {{ cls }}"><label for="f_{{ name }}">{{ label }}{% if required %} <span class="req">*</span>{% endif %}</label>
+<input id="f_{{ name }}" type="{{ type }}" name="{{ name }}" value="{{ value if value is not none else '' }}"{% if required %} required{% endif %}{% if placeholder %} placeholder="{{ placeholder }}"{% endif %}{% if list %} list="{{ list }}"{% endif %} {{ extra }}></div>
+{% endmacro %}
+
+{% macro select(label, name, options, value='', cls='c-6', blank='', required=False) %}
+<div class="fld {{ cls }}"><label for="f_{{ name }}">{{ label }}{% if required %} <span class="req">*</span>{% endif %}</label>
+<select id="f_{{ name }}" name="{{ name }}"{% if required %} required{% endif %}>{% if blank %}<option value="">{{ blank }}</option>{% endif %}
+{% for o in options %}<option value="{{ o }}"{% if o == value %} selected{% endif %}>{{ o if o else '—' }}</option>{% endfor %}</select></div>
+{% endmacro %}
+
+{% macro att_chip(status) %}{% if status.startswith('حاضر') %}<span class="chip green">{{ status }}</span>{% elif status.startswith('غیر') %}<span class="chip red">{{ status }}</span>{% elif status.startswith('چھٹی') %}<span class="chip yellow">{{ status }}</span>{% else %}<span class="chip blue">{{ status }}</span>{% endif %}{% endmacro %}
+
+{% macro grade_chip(g) %}<span class="chip grade {% if g in ('A+','A') %}green{% elif g in ('B','C') %}yellow{% elif g == 'F' %}red{% endif %}">{{ g }}</span>{% endmacro %}
+
+{% macro avatar(s, cls='') %}{% if s and s['photo'] %}<img class="avatar {{ cls }}" src="/static/{{ s['photo'] }}" alt="">{% else %}<span class="avatar {{ cls }}">{{ (s['name'] or '؟')[:1] if s else '؟' }}</span>{% endif %}{% endmacro %}
+
+{% macro del_form(action, msg, label='حذف') %}<form method="post" action="{{ action }}" class="inline" data-confirm="{{ msg }}"><button class="btn btn-sm btn-danger">{{ label }}</button></form>{% endmacro %}
+
+{% macro empty_row(cols, text='ریکارڈ موجود نہیں') %}<tr><td colspan="{{ cols }}" class="empty">{{ text }}</td></tr>{% endmacro %}
+
+{% macro kpi_inner(label, value, ico, tone, unit) %}<span class="tile {{ tone }}">{{ icon(ico) }}</span><span><span class="v">{{ value }}{% if unit %} <small>{{ unit }}</small>{% endif %}</span><br><span class="l">{{ label }}</span></span>{% endmacro %}
+{% macro kpi(label, value, ico, tone='', href='', unit='') %}{% if href %}<a class="kpi" href="{{ href }}">{{ kpi_inner(label, value, ico, tone, unit) }}</a>{% else %}<div class="kpi">{{ kpi_inner(label, value, ico, tone, unit) }}</div>{% endif %}{% endmacro %}
+
+{% macro class_filter(classes, selected, name='class_name', label='کلاس', all_label='تمام کلاسیں') %}
+<div class="fld"><label>{{ label }}</label><select name="{{ name }}"><option value="">{{ all_label }}</option>{% for c in classes %}<option value="{{ c }}"{% if c == selected %} selected{% endif %}>{{ c }}</option>{% endfor %}</select></div>
+{% endmacro %}
+
+{% macro month_select(name, selected, label='مہینہ', blank='تمام') %}
+<div class="fld"><label>{{ label }}</label><select name="{{ name }}">{% if blank %}<option value="">{{ blank }}</option>{% endif %}{% for m in MONTHS %}<option{% if m == selected %} selected{% endif %}>{{ m }}</option>{% endfor %}</select></div>
+{% endmacro %}
+
+{% macro letterhead(school) %}<div class="letterhead">{% if school.logo %}<img src="/static/{{ school.logo }}" alt="">{% else %}<div class="lh-logo">{{ icon('cap') }}</div>{% endif %}<div><h1>{{ school.name }}</h1><p>{{ school.address or '' }}{% if school.phone %} · {{ school.phone }}{% endif %}</p></div></div>{% endmacro %}

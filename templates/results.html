@@ -1,0 +1,46 @@
+{% extends 'base.html' %}{% import '_m.html' as m %}
+{% block title %}امتحانی نتائج{% endblock %}
+{% block page_title %}امتحانی نتائج{% endblock %}
+{% block content %}
+<div class="grid g2">
+<section class="card">
+  <h3 class="card-title">{{ m.icon('book') }} پوری کلاس کے نمبر ایک ساتھ درج کریں</h3>
+  <p class="muted">کلاس، امتحان اور مضمون منتخب کریں — پھر تمام طلبہ کے نمبر ایک ہی جدول میں لکھیں۔</p>
+  <a class="btn btn-primary btn-lg" href="/results/entry">{{ m.icon('plus') }} کلاس وار نمبر درج کریں</a>
+  <hr>
+  <h4>رزلٹ کارڈ پرنٹ (پوری کلاس)</h4>
+  <form class="filters" method="get" action="/results/cards" target="_blank">
+    {{ m.class_filter(classes, '', all_label='کلاس منتخب کریں') }}
+    <div class="fld"><label>امتحان</label><select name="exam">{% for e in exams %}<option>{{ e }}</option>{% endfor %}</select></div>
+    <button class="btn btn-dark">{{ m.icon('print') }} کارڈ</button>
+  </form>
+</section>
+<section class="card">
+  <h3 class="card-title">{{ m.icon('edit') }} ایک طالب علم کا رزلٹ</h3>
+  <form method="post" action="/results/new" class="form-grid">
+    <div class="fld c-12"><label>طالب علم <span class="req">*</span></label><select name="student_id" required><option value="">— منتخب کریں —</option>{% for s in students %}<option value="{{ s.id }}">{{ s.name }} ({{ s.father_name or '—' }}) — {{ s.admission_class }}</option>{% endfor %}</select></div>
+    {{ m.field('امتحان کا نام', 'test_name', required=True, list='examList', cls='c-6', placeholder='مثلاً: ششماہی امتحان') }}
+    {{ m.field('مضمون (اختیاری)', 'subject', list='subjList', cls='c-6') }}
+    {{ m.field('کل نمبر', 'total_marks', type='number', required=True, cls='c-6') }}{{ m.field('حاصل کردہ نمبر', 'obtained_marks', type='number', required=True, cls='c-6') }}
+    <div class="c-12"><button class="btn btn-primary btn-block">محفوظ کریں</button></div>
+  </form>
+  <datalist id="examList">{% for e in exams %}<option value="{{ e }}">{% endfor %}</datalist><datalist id="subjList">{% for e in subjects %}<option value="{{ e }}">{% endfor %}</datalist>
+</section>
+</div>
+
+<section class="card">
+  <h3 class="card-title">{{ m.icon('chart') }} نتائج کا ریکارڈ</h3>
+  <form class="filters" method="get">
+    <div class="fld" style="flex:2"><label>طالب علم کا نام</label><input type="text" name="q" value="{{ q }}"></div>
+    <div class="fld"><label>امتحان</label><select name="exam"><option value="">تمام</option>{% for e in exams %}<option{% if e==exam %} selected{% endif %}>{{ e }}</option>{% endfor %}</select></div>
+    {{ m.class_filter(classes, class_name) }}
+    <button class="btn btn-dark">{{ m.icon('search') }} فلٹر</button><a class="btn" href="/results">صاف کریں</a>
+  </form>
+  <div class="table-wrap"><table><thead><tr><th>طالب علم</th><th>درجہ</th><th>امتحان</th><th>مضمون</th><th class="num">حاصل / کل</th><th class="num">%</th><th>گریڈ</th><th></th></tr></thead><tbody>
+  {% for r in results %}<tr><td>{{ r.student_name or 'حذف شدہ' }}</td><td>{{ r.admission_class or '—' }}</td><td>{{ r.test_name }}</td><td>{{ r.subject or '—' }}</td>
+    <td class="num"><b>{{ r.obtained_marks }}</b> / {{ r.total_marks }}</td><td class="num">{{ r.pct|pctfmt }}</td><td>{{ m.grade_chip(r.grade) }}</td>
+    <td class="actions">{% if r.student_id %}<a class="btn btn-sm" target="_blank" href="/results/card?student_id={{ r.student_id }}&exam={{ r.test_name|urlencode }}">کارڈ</a> {% endif %}<a class="btn btn-sm" href="/results/{{ r.id }}/edit">ترمیم</a>
+    {{ m.del_form('/results/' ~ r.id ~ '/delete', 'کیا یہ رزلٹ حذف کرنا ہے؟') }}</td></tr>
+  {% else %}{{ m.empty_row(8, 'کوئی رزلٹ نہیں ملا') }}{% endfor %}</tbody></table></div>
+</section>
+{% endblock %}

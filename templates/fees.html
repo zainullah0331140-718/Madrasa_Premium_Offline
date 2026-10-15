@@ -1,0 +1,38 @@
+{% extends 'base.html' %}{% import '_m.html' as m %}
+{% block title %}فیس اور فنڈز{% endblock %}
+{% block page_title %}فیس اور فنڈز{% endblock %}
+{% block content %}
+<section class="card">
+  <h3 class="card-title">{{ m.icon('plus') }} نئی رقم وصول کریں<span class="tools"><a class="btn btn-sm" href="/fees/defaulters">{{ m.icon('warn') }} بقایا جات / ڈیفالٹرز</a></span></h3>
+  <form method="post" action="/fees/new" class="form-grid">
+    <div class="fld c-4"><label>طالب علم <span class="req">*</span></label>
+      <select name="student_id" id="feeStudent" required><option value="">— منتخب کریں —</option>
+      {% for s in students %}<option value="{{ s.id }}" data-fee="{{ s.fee }}">{{ s.name }} ({{ s.father_name or '—' }}) — {{ s.admission_class }}</option>{% endfor %}</select></div>
+    <div class="fld c-3"><label>قسم</label><select name="payment_type" id="feeType">{% for t in fee_types %}<option>{{ t }}</option>{% endfor %}</select></div>
+    <div class="fld c-3"><label>رقم ({{ st.currency }}) <span class="req">*</span></label><input type="number" min="1" name="amount" id="feeAmount" required></div>
+    {{ m.field('تاریخ', 'paid_date', today, type='date', cls='c-2') }}
+    {{ m.select('مہینہ', 'month', MONTHS, cur_month, cls='c-3') }}{{ m.field('سال', 'year', cur_year, type='number', cls='c-3') }}
+    {{ m.field('نوٹ (اختیاری)', 'note', cls='c-6') }}
+    <div class="c-12"><button class="btn btn-primary btn-lg">{{ m.icon('check') }} رقم محفوظ کریں اور رسید بنائیں</button></div>
+  </form>
+</section>
+
+<section class="card">
+  <h3 class="card-title">{{ m.icon('wallet') }} ریکارڈ</h3>
+  <form class="filters" method="get">
+    <div class="fld" style="flex:2"><label>طالب علم کا نام</label><input type="text" name="q" value="{{ q }}"></div>
+    {{ m.month_select('month', month) }}
+    <div class="fld"><label>قسم</label><select name="ptype"><option value="">تمام</option>{% for t in fee_types %}<option{% if t==ptype %} selected{% endif %}>{{ t }}</option>{% endfor %}</select></div>
+    {{ m.field('سال', 'year', year, type='number', cls='') }}
+    <button class="btn btn-dark">{{ m.icon('search') }} فلٹر</button><a class="btn" href="/fees">صاف کریں</a>
+  </form>
+  <div class="table-wrap"><table><thead><tr><th class="num">رسید</th><th>طالب علم</th><th>درجہ</th><th>قسم</th><th>مہینہ</th><th>تاریخ</th><th class="num">رقم</th><th></th></tr></thead><tbody>
+  {% for f in fees %}<tr><td class="num">#{{ f.id }}</td><td>{{ f.student_name or 'حذف شدہ طالب علم' }}</td><td>{{ f.admission_class or '—' }}</td>
+    <td><span class="chip {{ 'yellow' if f.payment_type == 'عطیہ / فنڈ' }}">{{ f.payment_type }}</span></td><td>{{ f.month }} {{ f.year or '' }}</td><td class="num">{{ f.paid_date or '—' }}</td>
+    <td class="num"><b>{{ f.amount|money }}</b></td>
+    <td class="actions"><a class="btn btn-sm" target="_blank" href="/fees/{{ f.id }}/receipt">{{ m.icon('print') }} رسید</a> <a class="btn btn-sm" href="/fees/{{ f.id }}/edit">ترمیم</a>
+      {{ m.del_form('/fees/' ~ f.id ~ '/delete', 'کیا یہ فیس کا ریکارڈ حذف کرنا ہے؟') }}</td></tr>
+  {% else %}{{ m.empty_row(8, 'کوئی ریکارڈ نہیں ملا') }}{% endfor %}</tbody>
+  <tfoot><tr><td colspan="6">فیس کا مجموعہ (ہدیہ کے بغیر) · ہدیہ / فنڈ: {{ donations|money }}</td><td class="num">{{ total|money }}</td><td></td></tr></tfoot></table></div>
+</section>
+{% endblock %}

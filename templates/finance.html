@@ -1,0 +1,21 @@
+{% extends 'base.html' %}{% import '_m.html' as m %}
+{% block title %}آمدن و خرچ{% endblock %}
+{% block page_title %}سالانہ آمدن و اخراجات رپورٹ{% endblock %}
+{% block content %}
+<form class="filters" method="get">{{ m.field('سال', 'year', year, type='number', cls='') }}<button class="btn btn-dark">دکھائیں</button><button type="button" class="btn" data-print>{{ m.icon('print') }} پرنٹ</button></form>
+<div class="grid g4">
+  {{ m.kpi('فیس وصولی', totals.fees|money, 'wallet', 'green', '', st.currency) }}
+  {{ m.kpi('ہدیہ / فنڈ', totals.don|money, 'coins', '', '', st.currency) }}
+  {{ m.kpi('اخراجات + تنخواہیں', (totals.exp + totals.sal)|money, 'receipt', 'red', '', st.currency) }}
+  {{ m.kpi('خالص بچت', totals.net|money, 'chart', 'grey', '', st.currency) }}
+</div>
+<section class="card"><h3 class="card-title">{{ m.icon('chart') }} ماہانہ موازنہ — {{ year }}</h3>
+  <div class="chart" data-type="bars" data-chart='{{ table|tojson }}'></div>
+  <div class="legend"><span><i style="background:#f5b50a"></i>آمدن</span><span><i style="background:#aab0b8"></i>اخراجات</span></div></section>
+<section class="card"><h3 class="card-title">{{ m.icon('coins') }} ماہ وار تفصیل</h3>
+  <div class="table-wrap"><table><thead><tr><th>مہینہ</th><th class="num">فیس</th><th class="num">ہدیہ</th><th class="num">خرچے</th><th class="num">تنخواہیں</th><th class="num">بچت</th></tr></thead><tbody>
+  {% for r in table %}<tr><td>{{ r.label }}</td><td class="num">{{ r.fees|money }}</td><td class="num">{{ r.don|money }}</td><td class="num">{{ r.exp|money }}</td><td class="num">{{ r.sal|money }}</td><td class="num"><b style="color:{{ '#15803d' if r.net >= 0 else '#c0392b' }}">{{ r.net|money }}</b></td></tr>{% endfor %}</tbody>
+  <tfoot><tr><td>کل</td><td class="num">{{ totals.fees|money }}</td><td class="num">{{ totals.don|money }}</td><td class="num">{{ totals.exp|money }}</td><td class="num">{{ totals.sal|money }}</td><td class="num">{{ totals.net|money }}</td></tr></tfoot></table></div>
+  {% if undated %}<div class="note-info mt-s">پرانے ریکارڈ جن پر تاریخ درج نہیں: {{ undated|money }} {{ st.currency }} (یہ ماہانہ جدول میں شامل نہیں ہوتے مگر ڈیش بورڈ کے "کل" میں شمار ہیں)۔</div>{% endif %}
+</section>
+{% endblock %}

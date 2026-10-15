@@ -1,0 +1,32 @@
+{% extends 'base.html' %}{% import '_m.html' as m %}
+{% block title %}طلبہ کا ریکارڈ{% endblock %}
+{% block page_title %}طلبہ کا ریکارڈ{% endblock %}
+{% block content %}
+<section class="card">
+  <h3 class="card-title">{{ m.icon('users') }} طلبہ کی فہرست <span class="chip yellow">{{ students|length }}</span>
+    <span class="tools">
+      <a class="btn btn-sm btn-primary" href="/students/new">{{ m.icon('plus') }} نیا داخلہ</a>
+      <a class="btn btn-sm" href="/students/promote">اگلی کلاس میں ترقی</a>
+      <a class="btn btn-sm" href="/students/cards?class_name={{ class_name|urlencode }}" target="_blank">{{ m.icon('id') }} شناختی کارڈ</a>
+      <a class="btn btn-sm" href="/students/export.csv">{{ m.icon('download') }} Excel/CSV</a>
+      <button class="btn btn-sm" type="button" data-print>{{ m.icon('print') }} فہرست پرنٹ</button>
+    </span></h3>
+  <form class="filters" method="get">
+    <div class="fld" style="flex:2"><label>تلاش (نام، ولدیت، فون، رول نمبر)</label><input type="text" name="q" value="{{ q }}"></div>
+    {{ m.class_filter(classes, class_name) }}
+    <div class="fld"><label>حالت</label><select name="state"><option value="">فعال طلبہ</option>{% for x in states %}<option value="{{ x }}"{% if x==state %} selected{% endif %}>{{ x }}</option>{% endfor %}<option value="all"{% if state=='all' %} selected{% endif %}>تمام</option></select></div>
+    <button class="btn btn-dark">{{ m.icon('search') }} فلٹر</button>
+  </form>
+  <div class="table-wrap"><table>
+    <thead><tr><th>تصویر</th><th class="num">رول</th><th>نام</th><th>ولدیت</th><th>درجہ</th><th>فون</th><th>حالت</th><th class="no-print"></th></tr></thead><tbody>
+    {% for s in students %}<tr>
+      <td>{{ m.avatar(s) }}</td><td class="num">{{ s.roll_number or '—' }}</td>
+      <td><a href="/students/{{ s.id }}"><b>{{ s.name }}</b></a></td><td>{{ s.father_name or '—' }}</td>
+      <td><span class="chip">{{ s.admission_class }}</span></td><td class="num">{{ s.phone or '—' }}</td>
+      <td>{% if s.status and s.status != 'فعال' %}<span class="chip red">{{ s.status }}</span>{% else %}<span class="chip green">فعال</span>{% endif %}</td>
+      <td class="actions no-print"><a class="btn btn-sm" href="/students/{{ s.id }}">پروفائل</a> <a class="btn btn-sm" href="/students/{{ s.id }}/edit">ترمیم</a>
+        {{ m.del_form('/students/' ~ s.id ~ '/delete', 'کیا ' ~ s.name ~ ' کا ریکارڈ (حاضری اور نتائج سمیت) حذف کرنا ہے؟') }}</td>
+    </tr>{% else %}{{ m.empty_row(8, 'کوئی طالب علم نہیں ملا') }}{% endfor %}
+  </tbody></table></div>
+</section>
+{% endblock %}

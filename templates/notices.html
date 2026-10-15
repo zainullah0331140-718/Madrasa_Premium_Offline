@@ -1,0 +1,13 @@
+{% extends 'base.html' %}{% import '_m.html' as m %}
+{% block title %}اعلانات{% endblock %}
+{% block page_title %}اعلانات{% endblock %}
+{% block content %}
+<div class="grid g-main">
+<section class="card"><h3 class="card-title">{{ m.icon('bell') }} تمام اعلانات</h3>
+  {% for n in notices %}<div class="notice-box"><div class="flex between items-center"><b>{{ n.title }}</b>{{ m.del_form('/notices/' ~ n.id ~ '/delete', 'یہ اعلان حذف کریں؟') }}</div><div class="muted small">{{ n.created_at }}</div>{% if n.body %}<p>{{ n.body }}</p>{% endif %}</div>
+  {% else %}<p class="muted">ابھی کوئی اعلان نہیں۔</p>{% endfor %}</section>
+<section class="card"><h3 class="card-title">{{ m.icon('plus') }} نیا اعلان</h3>
+  <form method="post" action="/notices/new" class="form-grid">{{ m.field('عنوان', 'title', required=True, cls='c-12') }}
+    <div class="fld c-12"><label>تفصیل</label><textarea name="body"></textarea></div><div class="c-12"><button class="btn btn-primary btn-block">شائع کریں</button></div></form></section>
+</div>
+{% endblock %}

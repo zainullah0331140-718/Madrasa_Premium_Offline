@@ -1,0 +1,12 @@
+{% extends 'base.html' %}{% import '_m.html' as m %}
+{% block title %}فیس کی ترمیم{% endblock %}
+{% block page_title %}فیس کی ترمیم — رسید #{{ fee.id }}{% endblock %}
+{% block content %}
+<form class="card" method="post" action="/fees/{{ fee.id }}/edit"><div class="form-grid">
+  <div class="fld c-6"><label>طالب علم</label><select name="student_id">{% for s in students %}<option value="{{ s.id }}"{% if s.id == fee.student_id %} selected{% endif %}>{{ s.name }} — {{ s.admission_class }}</option>{% endfor %}</select></div>
+  {{ m.select('قسم', 'payment_type', fee_types, fee.payment_type, cls='c-3') }}{{ m.field('رقم', 'amount', fee.amount, type='number', cls='c-3', required=True) }}
+  {{ m.select('مہینہ', 'month', MONTHS, fee.month, cls='c-3') }}{{ m.field('سال', 'year', fee.year or cur_year, type='number', cls='c-3') }}
+  {{ m.field('تاریخ', 'paid_date', fee.paid_date or today, type='date', cls='c-3') }}{{ m.field('نوٹ', 'note', fee.note, cls='c-3') }}
+  <div class="c-12 flex gap"><button class="btn btn-primary btn-lg">{{ m.icon('check') }} محفوظ کریں</button><a class="btn btn-lg" href="/fees">منسوخ</a></div>
+</div></form>
+{% endblock %}

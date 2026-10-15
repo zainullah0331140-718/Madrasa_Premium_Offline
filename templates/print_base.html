@@ -1,0 +1,11 @@
+{% import '_m.html' as m %}
+<!DOCTYPE html>
+<html lang="ur" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}پرنٹ{% endblock %} — {{ school.name }}</title><link rel="stylesheet" href="/static/app.css">
+{% block extra_head %}{% endblock %}</head>
+<body style="display:block">
+<svg width="0" height="0" style="position:absolute"><defs><symbol id="i-cap" viewBox="0 0 24 24"><path d="m2.5 9 9.5-5 9.5 5-9.5 5z"/><path d="M6.5 11.5v4.5c0 1.5 2.5 3 5.5 3s5.5-1.5 5.5-3v-4.5M21.5 9v6"/></symbol></defs></svg>
+<div class="toolbar no-print"><button class="btn btn-primary" type="button" data-print>{{ m.icon('print') }} پرنٹ کریں</button><a class="btn" href="javascript:history.back()">واپس</a></div>
+{% block sheet %}{% endblock %}
+<script src="/static/app.js"></script>
+</body></html>

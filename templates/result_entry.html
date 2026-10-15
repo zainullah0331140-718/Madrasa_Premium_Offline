@@ -1,0 +1,29 @@
+{% extends 'base.html' %}{% import '_m.html' as m %}
+{% block title %}کلاس وار نمبر{% endblock %}
+{% block page_title %}کلاس وار نمبر درج کریں{% endblock %}
+{% block content %}
+<section class="card">
+  <h3 class="card-title">{{ m.icon('book') }} مرحلہ 1: کلاس اور امتحان</h3>
+  <form class="filters" method="get">
+    <div class="fld"><label>کلاس</label><select name="class_name" required><option value="">منتخب کریں</option>{% for c in classes %}<option{% if c==class_name %} selected{% endif %}>{{ c }}</option>{% endfor %}</select></div>
+    {{ m.field('امتحان کا نام', 'exam', exam, required=True, list='ex', cls='', placeholder='مثلاً: سالانہ امتحان') }}
+    {{ m.field('مضمون', 'subject', subject, list='sb', cls='', placeholder='مثلاً: فقہ') }}
+    {{ m.field('کل نمبر', 'total', total, type='number', cls='') }}
+    <button class="btn btn-dark">طلبہ دکھائیں</button>
+  </form>
+  <datalist id="ex">{% for e in exams %}<option value="{{ e }}">{% endfor %}</datalist><datalist id="sb">{% for e in subjects %}<option value="{{ e }}">{% endfor %}</datalist>
+</section>
+{% if class_name and exam %}
+<form class="card" method="post" action="/results/entry">
+  <h3 class="card-title">{{ m.icon('edit') }} مرحلہ 2: نمبر لکھیں — {{ class_name }} · {{ exam }}{% if subject %} · {{ subject }}{% endif %}</h3>
+  <input type="hidden" name="class_name" value="{{ class_name }}"><input type="hidden" name="exam" value="{{ exam }}"><input type="hidden" name="subject" value="{{ subject }}">
+  <div class="filters"><div class="fld" style="max-width:200px"><label>کل نمبر <span class="req">*</span></label><input type="number" min="1" name="total" id="bulkTotal" value="{{ total }}" required></div>
+    <div class="hint">جس طالب علم کا خانہ خالی ہو اس کا نمبر محفوظ نہیں ہو گا۔ پہلے سے درج نمبر دوبارہ لکھنے پر اپڈیٹ ہوں گے۔</div></div>
+  <div class="table-wrap"><table><thead><tr><th class="num">رول</th><th>نام</th><th>ولدیت</th><th style="width:160px">حاصل نمبر</th><th class="num">فیصد</th></tr></thead><tbody>
+  {% for s in students %}<tr><td class="num">{{ s.roll_number or '—' }}</td><td><b>{{ s.name }}</b></td><td>{{ s.father_name or '—' }}</td>
+    <td><input class="marks" type="number" min="0" name="marks_{{ s.id }}" value="{{ marks.get(s.id, '') }}"></td><td class="num live">—</td></tr>
+  {% else %}{{ m.empty_row(5, 'اس کلاس میں کوئی طالب علم نہیں') }}{% endfor %}</tbody></table></div>
+  {% if students %}<div class="sticky-save"><button class="btn btn-primary btn-lg">{{ m.icon('check') }} تمام نمبر محفوظ کریں</button><a class="btn btn-lg" href="/results">واپس</a></div>{% endif %}
+</form>
+{% endif %}
+{% endblock %}

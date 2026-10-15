@@ -1,0 +1,27 @@
+{% extends 'base.html' %}{% import '_m.html' as m %}
+{% block title %}اخراجات{% endblock %}
+{% block page_title %}اخراجات اور تنخواہیں{% endblock %}
+{% block content %}
+<form class="filters" method="get">{{ m.field('مہینہ', 'month', month, type='month', cls='') }}<button class="btn btn-dark">{{ m.icon('search') }} دکھائیں</button></form>
+<div class="grid g3">
+  {{ m.kpi('اس ماہ کی آمدن', income|money, 'wallet', 'green', '', st.currency) }}
+  {{ m.kpi('کل اخراجات', total|money, 'receipt', 'red', '', st.currency) }}
+  {{ m.kpi('بچت', (income - total)|money, 'chart', 'grey', '', st.currency) }}
+</div>
+<div class="grid g-main">
+<section class="card">
+  <h3 class="card-title">{{ m.icon('receipt') }} اخراجات — {{ month }}<span class="tools"><button class="btn btn-sm" type="button" data-print>{{ m.icon('print') }} پرنٹ</button></span></h3>
+  <div class="table-wrap"><table><thead><tr><th>تاریخ</th><th>زمرہ</th><th>تفصیل</th><th class="num">رقم</th><th class="no-print"></th></tr></thead><tbody>
+  {% for r in rows %}<tr><td class="num">{{ r.date }}</td><td><span class="chip">{{ r.category }}</span></td><td>{{ r.note or '—' }}</td><td class="num"><b>{{ r.amount|money }}</b></td><td class="actions no-print">{{ m.del_form('/expenses/' ~ r.id ~ '/delete', 'کیا یہ خرچہ حذف کرنا ہے؟') }}</td></tr>
+  {% else %}{{ m.empty_row(5, 'اس ماہ کوئی خرچہ درج نہیں') }}{% endfor %}</tbody>
+  {% if sal_count %}<tfoot><tr><td colspan="3">اساتذہ کی تنخواہیں ({{ sal_count }} ادائیگیاں — اساتذہ کے پروفائل سے درج کریں)</td><td class="num">{{ sal_total|money }}</td><td class="no-print"></td></tr></tfoot>{% endif %}</table></div>
+  {% if by_cat %}<h4 class="mt">زمرہ وار خلاصہ</h4>{% set mx = by_cat.values()|max %}
+  {% for k, v in by_cat.items() %}<div class="bar-row"><span class="name">{{ k }}</span><span class="bar"><i style="width:{{ (v*100/mx)|round }}%"></i></span><span class="val" style="width:70px">{{ v|money }}</span></div>{% endfor %}{% endif %}
+</section>
+<section class="card"><h3 class="card-title">{{ m.icon('plus') }} نیا خرچہ</h3>
+  <form method="post" action="/expenses/new" class="form-grid">
+    {{ m.select('زمرہ', 'category', cats, cls='c-12') }}{{ m.field('رقم', 'amount', type='number', required=True, cls='c-6') }}{{ m.field('تاریخ', 'date', today, type='date', cls='c-6') }}
+    {{ m.field('تفصیل', 'note', cls='c-12') }}<div class="c-12"><button class="btn btn-primary btn-block">محفوظ کریں</button></div>
+  </form></section>
+</div>
+{% endblock %}

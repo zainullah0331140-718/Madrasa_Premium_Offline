@@ -1,0 +1,18 @@
+{% extends 'base.html' %}{% import '_m.html' as m %}
+{% block title %}ماہانہ حاضری{% endblock %}
+{% block page_title %}ماہانہ حاضری رپورٹ{% endblock %}
+{% block content %}
+<section class="card">
+  <h3 class="card-title">{{ m.icon('check') }} {{ class_name }} — {{ month_name }}<span class="tools"><button class="btn btn-sm" type="button" data-print>{{ m.icon('print') }} پرنٹ</button><a class="btn btn-sm" href="/attendance?class_name={{ class_name|urlencode }}">روزانہ شیٹ</a></span></h3>
+  <form class="filters" method="get">
+    <div class="fld"><label>کلاس</label><select name="class_name">{% for c in classes %}<option{% if c==class_name %} selected{% endif %}>{{ c }}</option>{% endfor %}</select></div>
+    {{ m.field('مہینہ', 'month', month, type='month', cls='') }}<button class="btn btn-dark">{{ m.icon('search') }} دکھائیں</button>
+  </form>
+  <div class="table-wrap"><table class="matrix"><thead><tr><th class="name">نام</th>{% for d in days %}<th>{{ d }}</th>{% endfor %}<th>ح</th><th>غ</th><th>چ</th><th>%</th></tr></thead><tbody>
+  {% for r in table %}<tr><td class="name">{{ r.s.name }}</td>
+    {% for d in days %}{% set v = r.g.get(d) %}<td class="{{ 'cell-p' if v=='P' else 'cell-a' if v=='A' else 'cell-l' if v=='L' }}">{{ {'P':'ح','A':'غ','L':'چ'}.get(v, '') }}</td>{% endfor %}
+    <td><b>{{ r.p }}</b></td><td><b>{{ r.a }}</b></td><td><b>{{ r.l }}</b></td><td><b>{{ r.pct }}</b></td></tr>
+  {% else %}{{ m.empty_row(days|length + 5, 'اس کلاس میں کوئی طالب علم نہیں') }}{% endfor %}</tbody></table></div>
+  <p class="hint mt-s">ح = حاضر · غ = غیر حاضر · چ = چھٹی</p>
+</section>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends 'base.html' %}{% import '_m.html' as m %}
+{% block title %}{{ s.name }}{% endblock %}
+{% block page_title %}طالب علم کا پروفائل{% endblock %}
+{% block content %}
+<section class="card">
+  <div class="profile-head">
+    {{ m.avatar(s, 'lg') }}
+    <div class="grow"><h2 style="margin:0">{{ s.name }} <small class="muted">ولد {{ s.father_name }}</small></h2>
+      <p><span class="chip yellow">{{ s.admission_class }}</span> <span class="chip">رول نمبر: {{ s.roll_number or '—' }}</span> {% if s.status and s.status != 'فعال' %}<span class="chip red">{{ s.status }}</span>{% else %}<span class="chip green">فعال</span>{% endif %}</p></div>
+    <div class="flex wrap gap">
+      <a class="btn btn-primary" href="/students/{{ s.id }}/edit">{{ m.icon('edit') }} ترمیم</a>
+      <a class="btn" target="_blank" href="/students/{{ s.id }}/print">{{ m.icon('print') }} مکمل ریکارڈ</a>
+      <a class="btn" target="_blank" href="/students/{{ s.id }}/card">{{ m.icon('id') }} شناختی کارڈ</a>
+      {{ m.del_form('/students/' ~ s.id ~ '/delete', 'کیا واقعی اس طالب علم کو حذف کرنا ہے؟') }}
+    </div>
+  </div>
+  <hr>
+  <dl class="kv">
+    <div><dt>جنس</dt><dd>{{ s.gender or '—' }}</dd></div><div><dt>تاریخ پیدائش</dt><dd>{{ s.birth_date or '—' }}</dd></div>
+    <div><dt>موبائل</dt><dd class="num">{{ s.phone or '—' }}</dd></div><div><dt>سرپرست</dt><dd>{{ s.guardian_name or '—' }} <span class="num">{{ s.guardian_phone or '' }}</span></dd></div>
+    <div><dt>ب فارم</dt><dd class="num">{{ s.bform or '—' }}</dd></div><div><dt>سابقہ درجہ</dt><dd>{{ s.previous_class or '—' }}</dd></div>
+    <div><dt>بورڈ / نوعیت</dt><dd>{{ s.board or '—' }}</dd></div><div><dt>رہائش</dt><dd>{{ s.residence or '—' }}</dd></div>
+    <div><dt>تاریخ داخلہ</dt><dd>{{ s.admission_date or '—' }}</dd></div><div><dt>ماہانہ فیس</dt><dd>{{ s.monthly_fee|money if s.monthly_fee is not none else 'کلاس کے مطابق' }}</dd></div>
+    <div style="grid-column:1/-1"><dt>پتہ</dt><dd>{{ s.address or '—' }}</dd></div>
+  </dl>
+</section>
+
+<div class="grid g3">
+  {{ m.kpi('حاضری فیصد', att_pct ~ '%', 'check', 'green') }}
+  {{ m.kpi('حاضر / غیر حاضر / چھٹی', n_p ~ ' / ' ~ n_a ~ ' / ' ~ n_l, 'users', 'grey') }}
+  {{ m.kpi('کل ادا شدہ فیس', paid|money, 'wallet', '', '', st.currency) }}
+</div>
+
+<div class="grid g2">
+<section class="card">
+  <h3 class="card-title">{{ m.icon('wallet') }} فیس کا ریکارڈ<span class="tools"><a class="btn btn-sm btn-primary" href="/fees">نئی رقم</a></span></h3>
+  <div class="table-wrap"><table><thead><tr><th>رسید</th><th>مہینہ</th><th>قسم</th><th class="num">رقم</th><th></th></tr></thead><tbody>
+  {% for f in fees %}<tr><td class="num">#{{ f.id }}</td><td>{{ f.month }} {{ f.year or '' }}</td><td>{{ f.payment_type }}</td><td class="num"><b>{{ f.amount|money }}</b></td><td class="actions"><a class="btn btn-sm" target="_blank" href="/fees/{{ f.id }}/receipt">رسید</a></td></tr>
+  {% else %}{{ m.empty_row(5) }}{% endfor %}</tbody></table></div>
+</section>
+<section class="card">
+  <h3 class="card-title">{{ m.icon('book') }} امتحانی نتائج</h3>
+  <div class="table-wrap"><table><thead><tr><th>امتحان</th><th>مضمون</th><th class="num">نمبر</th><th class="num">%</th><th>گریڈ</th></tr></thead><tbody>
+  {% for r in results %}<tr><td>{{ r.test_name }}</td><td>{{ r.subject or '—' }}</td><td class="num">{{ r.obtained_marks }} / {{ r.total_marks }}</td><td class="num">{{ r.pct|pctfmt }}</td><td>{{ m.grade_chip(r.grade) }}</td></tr>
+  {% else %}{{ m.empty_row(5) }}{% endfor %}</tbody></table></div>
+  {% if exams %}<div class="mt-s flex wrap gap">{% for e in exams %}<a class="btn btn-sm" target="_blank" href="/results/card?student_id={{ s.id }}&exam={{ e|urlencode }}">رزلٹ کارڈ: {{ e }}</a>{% endfor %}</div>{% endif %}
+</section>
+</div>
+<section class="card">
+  <h3 class="card-title">{{ m.icon('check') }} حالیہ حاضری</h3>
+  <div class="table-wrap"><table><thead><tr><th>تاریخ</th><th>حالت</th></tr></thead><tbody>
+  {% for a in att %}<tr><td class="num">{{ a.date }}</td><td>{{ m.att_chip(a.status) }}</td></tr>{% else %}{{ m.empty_row(2) }}{% endfor %}</tbody></table></div>
+</section>
+{% endblock %}

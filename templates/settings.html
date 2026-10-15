@@ -1,0 +1,38 @@
+{% extends 'base.html' %}{% import '_m.html' as m %}
+{% block title %}سیٹنگ{% endblock %}
+{% block page_title %}سیٹنگ، سیکیورٹی اور بیک اپ{% endblock %}
+{% block content %}
+<div class="grid g2">
+<form class="card" method="post" action="/settings"><h3 class="card-title">{{ m.icon('gear') }} ادارے کی معلومات</h3>
+  <p class="muted">یہ معلومات تمام پرنٹ (رسید، رزلٹ کارڈ، رپورٹ) پر لیٹر ہیڈ میں آتی ہیں۔</p>
+  <div class="form-grid">
+    {{ m.field('ادارے کا نام', 'name', school.name, required=True, cls='c-8') }}
+    {{ m.select('ادارے کی قسم', 'institution_type', ['مدرسہ', 'اسکول', 'کالج', 'اکیڈمی'], st.institution_type, cls='c-4') }}
+    {{ m.field('فون', 'phone', school.phone, type='tel', cls='c-6') }}{{ m.field('مہتمم / پرنسپل کا نام', 'principal', st.principal, cls='c-6') }}
+    {{ m.field('پاس نمبر (فیصد)', 'pass_mark', st.pass_mark, type='number', cls='c-4') }}{{ m.field('رسید پر عبارت', 'receipt_note', st.receipt_note, cls='c-8') }}
+    <div class="fld c-12"><label>پتہ</label><textarea name="address" style="min-height:64px">{{ school.address or '' }}</textarea></div>
+    <div class="c-12"><button class="btn btn-primary">{{ m.icon('check') }} محفوظ کریں</button></div>
+  </div></form>
+<div>
+<form class="card" method="post" action="/settings/logo" enctype="multipart/form-data"><h3 class="card-title">{{ m.icon('upload') }} ادارے کا لوگو</h3>
+  <div class="flex gap items-center"><div class="brand-logo">{% if school.logo %}<img src="/static/{{ school.logo }}" alt="">{% else %}{{ m.icon('cap') }}{% endif %}</div>
+  <input type="file" name="logo" accept=".jpg,.jpeg,.png,.webp,image/*" required><button class="btn btn-dark">اپلوڈ</button></div></form>
+<form class="card" method="post" action="/settings/password"><h3 class="card-title">{{ m.icon('shield') }} پاس ورڈ تحفظ ({{ 'فعال' if st.password_hash else 'بند' }})</h3>
+  <div class="form-grid">
+    {% if st.password_hash %}{{ m.field('موجودہ پاس ورڈ', 'current_password', type='password', cls='c-12', required=True) }}{% endif %}
+    {{ m.field('نیا پاس ورڈ (خالی = تحفظ ختم)', 'new_password', type='password', cls='c-6') }}{{ m.field('تصدیق', 'confirm_password', type='password', cls='c-6') }}
+    <div class="c-12"><button class="btn btn-primary">{{ m.icon('shield') }} اپڈیٹ کریں</button></div>
+  </div><p class="hint mt-s">پاس ورڈ بھولنے کی صورت میں بحالی کا آسان طریقہ نہیں — اسے محفوظ جگہ لکھ لیں۔</p></form>
+</div></div>
+
+<section class="card"><h3 class="card-title">{{ m.icon('download') }} بیک اپ اور بحالی
+  <span class="tools"><form method="post" action="/backup/create" class="inline"><button class="btn btn-sm btn-primary">ابھی بیک اپ بنائیں</button></form><a class="btn btn-sm" href="/backup/download">{{ m.icon('download') }} نیا بیک اپ ڈاؤن لوڈ</a></span></h3>
+  <div class="note-info mb">ہر دن پہلی بار پروگرام کھلنے پر خود کار بیک اپ بنتا ہے (آخری 14 محفوظ رہتے ہیں)۔ بیک اپ فائلیں <b>backups</b> فولڈر میں ہیں — انہیں USB میں بھی رکھیں۔</div>
+  <div class="table-wrap"><table><thead><tr><th>فائل</th><th>وقت</th><th class="num">سائز</th><th></th></tr></thead><tbody>
+  {% for b in backups %}<tr><td class="num" style="text-align:start">{{ b.name }}</td><td class="num">{{ b.time }}</td><td class="num">{{ b.size_kb }} KB</td><td class="actions"><a class="btn btn-sm" href="/backup/download?name={{ b.name|urlencode }}">ڈاؤن لوڈ</a></td></tr>
+  {% else %}{{ m.empty_row(4, 'ابھی کوئی بیک اپ نہیں') }}{% endfor %}</tbody></table></div>
+  <hr><h4>{{ m.icon('upload') }} بیک اپ سے ڈیٹا بحال کریں</h4>
+  <form method="post" action="/backup/restore" enctype="multipart/form-data" class="flex gap wrap items-center" data-confirm="موجودہ تمام ڈیٹا بیک اپ فائل سے بدل دیا جائے گا۔ (پرانا ڈیٹا بحالی سے پہلے خود محفوظ ہو جاتا ہے)۔ جاری رکھیں؟">
+    <input type="file" name="backup" accept=".db" required style="max-width:380px"><button class="btn btn-danger">بحال کریں</button></form>
+</section>
+{% endblock %}

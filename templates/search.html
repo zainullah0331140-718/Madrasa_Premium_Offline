@@ -1,0 +1,14 @@
+{% extends 'base.html' %}{% import '_m.html' as m %}
+{% block title %}تلاش{% endblock %}
+{% block page_title %}تلاش: "{{ query }}"{% endblock %}
+{% block content %}
+<section class="card"><h3 class="card-title">{{ m.icon('users') }} طلبہ ({{ students|length }})</h3>
+<div class="table-wrap"><table><thead><tr><th>نام</th><th>ولدیت</th><th>درجہ</th><th>فون</th><th></th></tr></thead><tbody>
+{% for s in students %}<tr><td><a href="/students/{{ s.id }}"><b>{{ s.name }}</b></a></td><td>{{ s.father_name }}</td><td>{{ s.admission_class }}</td><td class="num">{{ s.phone or '—' }}</td><td class="actions"><a class="btn btn-sm" href="/students/{{ s.id }}">پروفائل</a></td></tr>{% else %}{{ m.empty_row(5, 'کوئی طالب علم نہیں ملا') }}{% endfor %}</tbody></table></div></section>
+<section class="card"><h3 class="card-title">{{ m.icon('teacher') }} اساتذہ ({{ teachers|length }})</h3>
+<div class="table-wrap"><table><thead><tr><th>نام</th><th>مضمون</th><th>فون</th><th></th></tr></thead><tbody>
+{% for t in teachers %}<tr><td><a href="/teachers/{{ t.id }}"><b>{{ t.name }}</b></a></td><td>{{ t.subject or '—' }}</td><td class="num">{{ t.phone or '—' }}</td><td class="actions"><a class="btn btn-sm" href="/teachers/{{ t.id }}">پروفائل</a></td></tr>{% else %}{{ m.empty_row(4, 'کوئی استاد نہیں ملا') }}{% endfor %}</tbody></table></div></section>
+<section class="card"><h3 class="card-title">{{ m.icon('wallet') }} فیس اور فنڈز ({{ fees|length }})</h3>
+<div class="table-wrap"><table><thead><tr><th>رسید</th><th>طالب علم</th><th>مہینہ</th><th>قسم</th><th class="num">رقم</th><th></th></tr></thead><tbody>
+{% for f in fees %}<tr><td class="num">#{{ f.id }}</td><td>{{ f.student_name or 'حذف شدہ' }}</td><td>{{ f.month }}</td><td>{{ f.payment_type }}</td><td class="num">{{ f.amount|money }}</td><td class="actions"><a class="btn btn-sm" target="_blank" href="/fees/{{ f.id }}/receipt">رسید</a></td></tr>{% else %}{{ m.empty_row(6, 'کوئی ریکارڈ نہیں ملا') }}{% endfor %}</tbody></table></div></section>
+{% endblock %}

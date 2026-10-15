@@ -1,0 +1,64 @@
+{% extends 'base.html' %}{% import '_m.html' as m %}
+{% block title %}ڈیش بورڈ{% endblock %}
+{% block page_title %}ڈیش بورڈ{% endblock %}
+{% block content %}
+<div class="grid g4">
+  {{ m.kpi('کل طلبہ', n_students, 'users', href='/students') }}
+  {{ m.kpi('اساتذہ', n_teachers, 'teacher', 'grey', '/teachers') }}
+  {{ m.kpi('کلاسیں', n_classes, 'layers', 'grey', '/classes') }}
+  {{ m.kpi('آج کی حاضری', att_pct ~ '%', 'check', 'green', '/attendance') }}
+</div>
+<div class="grid g4">
+  {{ m.kpi('اس ماہ فیس وصولی', m_fees|money, 'wallet', 'green', '/fees', st.currency) }}
+  {{ m.kpi('اس ماہ ہدیہ / فنڈ', m_don|money, 'coins', '', '/fees?ptype=عطیہ / فنڈ', st.currency) }}
+  {{ m.kpi('اس ماہ اخراجات', m_exp|money, 'receipt', 'red', '/expenses', st.currency) }}
+  {{ m.kpi('اس ماہ بچت', (m_fees + m_don - m_exp)|money, 'chart', 'grey', '/finance', st.currency) }}
+</div>
+
+<div class="grid g-main">
+  <section class="card">
+    <h3 class="card-title">{{ m.icon('chart') }} آمدن اور اخراجات — پچھلے 6 ماہ
+      <span class="tools"><a class="btn btn-sm" href="/finance">تفصیلی رپورٹ</a></span></h3>
+    <div class="chart" data-type="bars" data-chart='{{ series|tojson }}'></div>
+    <div class="legend"><span><i style="background:#f5b50a"></i>آمدن (فیس + ہدیہ)</span><span><i style="background:#aab0b8"></i>اخراجات (خرچے + تنخواہیں)</span></div>
+  </section>
+  <section class="card">
+    <h3 class="card-title">{{ m.icon('check') }} آج کی حاضری</h3>
+    {% if marked %}
+    <div class="chart" data-type="donut" data-chart='{{ [{"label":"حاضر","value":present|length,"color":"#f5b50a"},{"label":"غیر حاضر","value":absent|length,"color":"#4b5563"},{"label":"چھٹی","value":leave|length,"color":"#cfd3d9"}]|tojson }}'></div>
+    {% if absent %}<details class="list"><summary>غیر حاضر طلبہ ({{ absent|length }})</summary><ul>{% for n in absent %}<li>{{ n }}</li>{% endfor %}</ul></details>{% endif %}
+    {% if leave %}<details class="list"><summary>چھٹی پر ({{ leave|length }})</summary><ul>{% for n in leave %}<li>{{ n }}</li>{% endfor %}</ul></details>{% endif %}
+    {% else %}<p class="muted center" style="padding:30px 0">آج کی حاضری ابھی نہیں لگی۔</p><a class="btn btn-primary btn-block" href="/attendance">حاضری لگائیں</a>{% endif %}
+  </section>
+</div>
+
+<div class="grid g3">
+  <section class="card">
+    <h3 class="card-title">{{ m.icon('layers') }} کلاس وار طلبہ</h3>
+    {% set mx = (strength|map(attribute='value')|max) if strength else 1 %}
+    {% for c in strength %}<div class="bar-row"><span class="name">{{ c.label }}</span><span class="bar"><i style="width:{{ (c.value*100/mx)|round }}%"></i></span><span class="val">{{ c.value }}</span></div>
+    {% else %}<p class="muted">ابھی کوئی طالب علم درج نہیں۔</p>{% endfor %}
+  </section>
+  <section class="card">
+    <h3 class="card-title">{{ m.icon('book') }} امتحانی نتائج</h3>
+    <div class="bar-row"><span class="name">نتیجہ درج</span><span class="bar"><i style="width:{{ (with_res|length*100/(n_students or 1))|round }}%"></i></span><span class="val">{{ with_res|length }}</span></div>
+    <div class="bar-row"><span class="name">درج نہیں</span><span class="bar"><i style="width:{{ (without_res|length*100/(n_students or 1))|round }}%;background:#aab0b8"></i></span><span class="val">{{ without_res|length }}</span></div>
+    {% if without_res %}<details class="list"><summary>جن کا نتیجہ درج نہیں ({{ without_res|length }})</summary><ul>{% for n in without_res %}<li>{{ n }}</li>{% endfor %}</ul></details>{% endif %}
+    <a class="btn btn-block mt-s" href="/results/entry">نمبر درج کریں</a>
+  </section>
+  <section class="card">
+    <h3 class="card-title">{{ m.icon('bell') }} اعلانات<span class="tools"><a class="btn btn-sm" href="/notices">تمام</a></span></h3>
+    {% for n in notices %}<div class="notice-box"><b>{{ n.title }}</b><div class="muted small">{{ n.created_at }}</div>{% if n.body %}<div class="small">{{ n.body }}</div>{% endif %}</div>
+    {% else %}<p class="muted">کوئی اعلان نہیں۔</p>{% endfor %}
+    {% if birthdays %}<div class="note-info mt-s">🎂 آج سالگرہ: {% for b in birthdays %}{{ b.name }}{{ '، ' if not loop.last }}{% endfor %}</div>{% endif %}
+  </section>
+</div>
+
+<section class="card">
+  <h3 class="card-title">{{ m.icon('wallet') }} حالیہ فیس / ہدیہ<span class="tools"><a class="btn btn-sm btn-primary" href="/fees">{{ m.icon('plus') }} نئی رقم</a><a class="btn btn-sm" href="/fees/defaulters">بقایا جات</a></span></h3>
+  <div class="table-wrap"><table><thead><tr><th>رسید</th><th>طالب علم</th><th>قسم</th><th>مہینہ</th><th class="num">رقم</th><th></th></tr></thead><tbody>
+  {% for f in recent_fees %}<tr><td class="num">#{{ f.id }}</td><td>{{ f.student_name or 'حذف شدہ طالب علم' }}</td><td><span class="chip {{ 'yellow' if f.payment_type == 'عطیہ / فنڈ' else '' }}">{{ f.payment_type }}</span></td><td>{{ f.month }}</td><td class="num"><b>{{ f.amount|money }}</b></td><td class="actions"><a class="btn btn-sm" target="_blank" href="/fees/{{ f.id }}/receipt">رسید</a></td></tr>
+  {% else %}{{ m.empty_row(6, 'ابھی کوئی فیس درج نہیں') }}{% endfor %}</tbody></table></div>
+</section>
+<div class="note-info">کل جمع شدہ فیس: <b>{{ fee_total|money }}</b> {{ st.currency }} &nbsp;|&nbsp; کل ہدیہ / فنڈ: <b>{{ hadiya_total|money }}</b> {{ st.currency }}</div>
+{% endblock %}

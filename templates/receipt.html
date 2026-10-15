@@ -1,0 +1,16 @@
+{% extends 'print_base.html' %}{% import '_m.html' as m %}
+{% block title %}رسید #{{ r.id }}{% endblock %}
+{% block sheet %}<div class="sheet receipt">
+  {{ m.letterhead(school) }}
+  <div class="doc-title">{{ 'رسید ہدیہ / فنڈ' if r.payment_type == 'عطیہ / فنڈ' else 'فیس کی رسید' }}</div>
+  <table>
+    <tr><th>رسید نمبر</th><td>#{{ r.id }}</td><th>تاریخ</th><td>{{ r.paid_date or '—' }}</td></tr>
+    <tr><th>نام</th><td>{{ r.student_name or 'حذف شدہ طالب علم' }}</td><th>ولدیت</th><td>{{ r.father_name or '—' }}</td></tr>
+    <tr><th>درجہ</th><td>{{ r.admission_class or '—' }}</td><th>رول نمبر</th><td>{{ r.roll_number or '—' }}</td></tr>
+    <tr><th>قسم</th><td>{{ r.payment_type }}</td><th>برائے ماہ</th><td>{{ r.month }} {{ r.year or '' }}</td></tr>
+    {% if r.note %}<tr><th>نوٹ</th><td colspan="3">{{ r.note }}</td></tr>{% endif %}
+  </table>
+  <p class="center mt"><span class="amount-box">{{ r.amount|money }} {{ st.currency }}</span> &nbsp; <span class="stamp">وصول شد</span></p>
+  <p class="center small" style="color:#555">{{ st.receipt_note }}</p>
+  <div class="sig"><div>دستخط جمع کنندہ</div><div>{{ st.principal or 'مہتمم / پرنسپل' }}</div></div>
+</div>{% endblock %}

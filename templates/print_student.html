@@ -1,0 +1,23 @@
+{% extends 'print_base.html' %}{% import '_m.html' as m %}
+{% block title %}ریکارڈ — {{ s.name }}{% endblock %}
+{% block sheet %}<div class="sheet">
+  {{ m.letterhead(school) }}
+  <div class="doc-title">طالب علم کا مکمل ریکارڈ</div>
+  <div class="flex gap-l" style="align-items:flex-start">
+    <div class="grow"><table><tr><th>نام</th><td>{{ s.name }}</td><th>ولدیت</th><td>{{ s.father_name }}</td></tr>
+      <tr><th>درجہ</th><td>{{ s.admission_class }}</td><th>رول نمبر</th><td>{{ s.roll_number or '—' }}</td></tr>
+      <tr><th>تاریخ پیدائش</th><td>{{ s.birth_date or '—' }}</td><th>ب فارم</th><td>{{ s.bform or '—' }}</td></tr>
+      <tr><th>فون</th><td>{{ s.phone or '—' }}</td><th>سرپرست</th><td>{{ s.guardian_name or '—' }} {{ s.guardian_phone or '' }}</td></tr>
+      <tr><th>تاریخ داخلہ</th><td>{{ s.admission_date or '—' }}</td><th>پتہ</th><td>{{ s.address or '—' }}</td></tr></table></div>
+    {% if s.photo %}<img src="/static/{{ s.photo }}" alt="" style="width:110px;height:130px;object-fit:cover;border:2px solid #1f2328;border-radius:8px">{% endif %}
+  </div>
+  <h3>فیس کا ریکارڈ</h3>
+  <table><tr><th>رسید</th><th>مہینہ</th><th>قسم</th><th>تاریخ</th><th>رقم</th></tr>
+  {% for f in fees %}<tr><td>#{{ f.id }}</td><td>{{ f.month }} {{ f.year or '' }}</td><td>{{ f.payment_type }}</td><td>{{ f.paid_date or '—' }}</td><td>{{ f.amount|money }} {{ st.currency }}</td></tr>{% else %}<tr><td colspan="5" class="center">کوئی ریکارڈ نہیں</td></tr>{% endfor %}</table>
+  <h3>امتحانی نتائج</h3>
+  <table><tr><th>امتحان</th><th>مضمون</th><th>کل نمبر</th><th>حاصل کردہ</th><th>گریڈ</th></tr>
+  {% for r in results %}<tr><td>{{ r.test_name }}</td><td>{{ r.subject or '—' }}</td><td>{{ r.total_marks }}</td><td>{{ r.obtained_marks }}</td><td>{{ r.grade }}</td></tr>{% else %}<tr><td colspan="5" class="center">کوئی ریکارڈ نہیں</td></tr>{% endfor %}</table>
+  <h3>حاضری کا خلاصہ</h3>
+  <p>کل دن: <b>{{ att|length }}</b> &nbsp; حاضر: <b>{{ n_p }}</b> &nbsp; فیصد: <b>{{ (n_p*100/att|length)|round(1) if att else 0 }}%</b></p>
+  <div class="sig"><div>دستخط سرپرست</div><div>کلاس ٹیچر</div><div>{{ st.principal or 'مہتمم / پرنسپل' }}</div></div>
+</div>{% endblock %}

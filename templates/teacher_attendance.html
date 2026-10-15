@@ -1,0 +1,23 @@
+{% extends 'base.html' %}{% import '_m.html' as m %}
+{% block title %}اساتذہ کی حاضری{% endblock %}
+{% block page_title %}اساتذہ کی حاضری{% endblock %}
+{% block content %}
+<section class="card">
+  <h3 class="card-title">{{ m.icon('check') }} روزانہ حاضری شیٹ</h3>
+  <form class="filters" method="get">{{ m.field('تاریخ', 'day', day, type='date', cls='') }}<button class="btn btn-dark">{{ m.icon('search') }} دکھائیں</button></form>
+  {% if not teachers %}<div class="note-info">پہلے <a href="/teachers">اساتذہ</a> درج کریں۔</div>{% else %}
+  <form method="post" action="/teacher-attendance/save"><input type="hidden" name="day" value="{{ day }}">
+    <div class="flex wrap gap mb"><button type="button" class="btn btn-sm" data-markall="حاضر">سب حاضر</button><button type="button" class="btn btn-sm" data-markall="غیر حاضر">سب غیر حاضر</button></div>
+    {% for t in teachers %}{% set cur = existing.get(t.id, 'حاضر') %}<div class="att-row"><span class="avatar">{{ t.name[:1] }}</span><div><b>{{ t.name }}</b> <span class="muted small">{{ t.subject or '' }}</span></div>
+      <div class="seg">{% for s, cls in [('حاضر','p'),('غیر حاضر','a'),('چھٹی','l'),('تاخیر','t')] %}<label><input type="radio" name="tt_{{ t.id }}" value="{{ s }}"{% if cur == s %} checked{% endif %}><span class="{{ cls }}">{{ s }}</span></label>{% endfor %}</div></div>{% endfor %}
+    <div class="sticky-save"><button class="btn btn-primary btn-lg">{{ m.icon('check') }} حاضری محفوظ کریں</button></div>
+  </form>{% endif %}
+</section>
+<section class="card">
+  <h3 class="card-title">{{ m.icon('chart') }} ماہانہ خلاصہ<span class="tools"><button class="btn btn-sm" type="button" data-print>{{ m.icon('print') }} پرنٹ</button></span></h3>
+  <form class="filters" method="get"><input type="hidden" name="day" value="{{ day }}">{{ m.field('مہینہ', 'month', month, type='month', cls='') }}<button class="btn btn-dark">دکھائیں</button></form>
+  <div class="table-wrap"><table><thead><tr><th>استاد</th><th>مضمون</th><th class="num">حاضر</th><th class="num">غیر حاضر</th><th class="num">چھٹی</th><th class="num">تاخیر</th></tr></thead><tbody>
+  {% for r in summary %}<tr><td><a href="/teachers/{{ r.id }}">{{ r.name }}</a></td><td>{{ r.subject or '—' }}</td><td class="num"><span class="chip green">{{ r.p or 0 }}</span></td><td class="num"><span class="chip red">{{ r.a or 0 }}</span></td><td class="num"><span class="chip yellow">{{ r.l or 0 }}</span></td><td class="num"><span class="chip blue">{{ r.late or 0 }}</span></td></tr>
+  {% else %}{{ m.empty_row(6) }}{% endfor %}</tbody></table></div>
+</section>
+{% endblock %}

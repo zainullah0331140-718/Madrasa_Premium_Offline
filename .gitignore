@@ -1,0 +1,15 @@
+# Python virtual environment
+.venv/
+venv/
+ENV/
+
+# Database files
+madrasa.db
+*.db
+
+# Python compiled files
+__pycache__/
+*.pyc
+
+# Backups
+backups/

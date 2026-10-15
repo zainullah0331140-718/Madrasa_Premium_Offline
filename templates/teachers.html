@@ -1,0 +1,25 @@
+{% extends 'base.html' %}{% import '_m.html' as m %}
+{% block title %}اساتذہ{% endblock %}
+{% block page_title %}اساتذہ کا ریکارڈ{% endblock %}
+{% block content %}
+<section class="card">
+  <h3 class="card-title">{{ m.icon('userplus') }} نیا استاد شامل کریں</h3>
+  <form method="post" action="/teachers/new" class="form-grid">
+    {{ m.field('نام', 'name', required=True, cls='c-4') }}{{ m.field('مضمون', 'subject', cls='c-4') }}{{ m.field('فون نمبر', 'phone', type='tel', cls='c-4') }}
+    {{ m.field('ماہانہ تنخواہ', 'salary', type='number', cls='c-3') }}{{ m.field('تعلیمی قابلیت', 'qualification', cls='c-3') }}
+    {{ m.field('تاریخ تقرری', 'joining_date', today, type='date', cls='c-3') }}{{ m.field('شناختی کارڈ نمبر', 'cnic', cls='c-3') }}
+    {{ m.field('پتہ', 'address', cls='c-12') }}
+    <div class="c-12"><button class="btn btn-primary">{{ m.icon('plus') }} محفوظ کریں</button></div>
+  </form>
+</section>
+<section class="card">
+  <h3 class="card-title">{{ m.icon('teacher') }} اساتذہ کی فہرست <span class="chip yellow">{{ teachers|length }}</span>
+    <span class="tools"><button class="btn btn-sm" type="button" data-print>{{ m.icon('print') }} پرنٹ</button></span></h3>
+  <div class="table-wrap"><table><thead><tr><th>نام</th><th>مضمون</th><th>فون</th><th>قابلیت</th><th class="num">تنخواہ</th><th class="no-print"></th></tr></thead><tbody>
+  {% for t in teachers %}<tr><td><a href="/teachers/{{ t.id }}"><b>{{ t.name }}</b></a></td><td>{{ t.subject or '—' }}</td><td class="num">{{ t.phone or '—' }}</td><td>{{ t.qualification or '—' }}</td><td class="num">{{ t.salary|money }}</td>
+    <td class="actions no-print"><a class="btn btn-sm" href="/teachers/{{ t.id }}">پروفائل</a> <a class="btn btn-sm" href="/teachers/{{ t.id }}/edit">ترمیم</a>
+    {{ m.del_form('/teachers/' ~ t.id ~ '/delete', 'کیا ' ~ t.name ~ ' کو حذف کرنا ہے؟') }}</td></tr>
+  {% else %}{{ m.empty_row(6, 'ابھی کوئی استاد درج نہیں') }}{% endfor %}</tbody>
+  <tfoot><tr><td colspan="4">ماہانہ تنخواہوں کا کل بجٹ</td><td class="num">{{ total_salary|money }}</td><td class="no-print"></td></tr></tfoot></table></div>
+</section>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends 'base.html' %}{% import '_m.html' as m %}
+{% block title %}{{ 'ترمیم' if s else 'نیا داخلہ' }}{% endblock %}
+{% block page_title %}{{ 'طالب علم کی ترمیم' if s else 'نیا داخلہ فارم' }}{% endblock %}
+{% block content %}
+<form class="card" method="post" enctype="multipart/form-data" action="{{ '/students/' ~ s.id ~ '/edit' if s else '/students/new' }}">
+  <h3 class="card-title">{{ m.icon('userplus') }} بنیادی معلومات</h3>
+  <div class="form-grid">
+    {{ m.field('طالب علم کا نام', 'student_name', s.name if s else '', required=True) }}
+    {{ m.field('ولدیت', 'father_name', s.father_name if s else '', required=True) }}
+    {{ m.field('موجودہ درجہ / کلاس', 'admission_class', (s.admission_class if s else default_class), required=True, list='classList', cls='c-4') }}
+    {{ m.field('رول نمبر', 'roll_number', (s.roll_number if s else roll), cls='c-4', placeholder='خالی چھوڑیں تو خود بنے گا') }}
+    {{ m.select('جنس', 'gender', ['', 'لڑکا', 'لڑکی'], s.gender if s else '', cls='c-4') }}
+    {{ m.field('تاریخ پیدائش', 'birth_date', s.birth_date if s else '', type='date', cls='c-4') }}
+    {{ m.field('ب فارم / شناختی نمبر', 'bform', s.bform if s else '', cls='c-4') }}
+    {{ m.field('موبائل نمبر', 'phone', s.phone if s else '', type='tel', cls='c-4') }}
+    {{ m.field('سابقہ درجہ', 'prev_class', s.previous_class if s else '', cls='c-4') }}
+    {{ m.select('بورڈ / نوعیت', 'board', boards, s.board if s else '', cls='c-4') }}
+    {{ m.select('رہائش', 'residence', residences, s.residence if s else '', cls='c-4') }}
+    {{ m.field('سرپرست کا نام', 'guardian_name', s.guardian_name if s else '', cls='c-4') }}
+    {{ m.field('سرپرست کا نمبر', 'guardian_phone', s.guardian_phone if s else '', type='tel', cls='c-4') }}
+    {{ m.field('ماہانہ فیس (اختیاری)', 'monthly_fee', s.monthly_fee if s and s.monthly_fee is not none else '', type='number', cls='c-4', placeholder='خالی = کلاس کی فیس') }}
+    {% if s %}{{ m.select('حالت', 'status', states, s.status or 'فعال', cls='c-4') }}{% endif %}
+    <div class="fld c-12"><label>پتہ</label><textarea name="address" style="min-height:64px">{{ s.address if s and s.address else '' }}</textarea></div>
+    <div class="fld c-6"><label>طالب علم کی تصویر (JPG / PNG / WEBP — زیادہ سے زیادہ 5MB)</label><input type="file" name="photo" accept=".jpg,.jpeg,.png,.webp,image/*"></div>
+    <div class="fld c-6"><label>نوٹس</label><input type="text" name="notes" value="{{ s.notes if s and s.notes else '' }}"></div>
+    <div class="c-12 flex gap"><button class="btn btn-primary btn-lg">{{ m.icon('check') }} محفوظ کریں</button><a class="btn btn-lg" href="{{ '/students/' ~ s.id if s else '/students' }}">منسوخ</a></div>
+  </div>
+  <datalist id="classList">{% for c in classes %}<option value="{{ c }}">{% endfor %}</datalist>
+</form>
+{% endblock %}

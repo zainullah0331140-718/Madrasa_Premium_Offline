@@ -1,0 +1,26 @@
+{% extends 'print_base.html' %}{% import '_m.html' as m %}
+{% block title %}رزلٹ کارڈ{% endblock %}
+{% block sheet %}
+{% for c in cards %}
+<div class="sheet rc">
+  {{ m.letterhead(school) }}
+  <div class="doc-title">رزلٹ کارڈ — {{ c.exam }}</div>
+  <div class="flex gap-l" style="align-items:flex-start">
+    <table class="grow"><tr><th>نام</th><td>{{ c.s.name }}</td><th>ولدیت</th><td>{{ c.s.father_name or '—' }}</td></tr>
+    <tr><th>درجہ</th><td>{{ c.s.admission_class }}</td><th>رول نمبر</th><td>{{ c.s.roll_number or c.s.id }}</td></tr></table>
+    {% if c.s.photo %}<img src="/static/{{ c.s.photo }}" alt="" style="width:80px;height:96px;object-fit:cover;border:2px solid #1f2328;border-radius:8px">{% endif %}
+  </div>
+  <table class="mt-s"><tr><th>#</th><th>مضمون</th><th>کل نمبر</th><th>حاصل کردہ</th><th>فیصد</th><th>گریڈ</th></tr>
+  {% for l in c.lines %}<tr><td>{{ loop.index }}</td><td>{{ l.subject }}</td><td>{{ l.total }}</td><td>{{ l.obtained }}</td><td>{{ l.pct|pctfmt }}%</td><td>{{ l.grade }}</td></tr>{% endfor %}
+  <tr><th colspan="2">مجموعہ</th><th>{{ c.total }}</th><th>{{ c.obtained }}</th><th>{{ c.pct|pctfmt }}%</th><th>{{ c.grade }}</th></tr></table>
+  <div class="summary">
+    <div><b>{{ c.pct|pctfmt }}%</b><small>فیصد</small></div>
+    <div><b>{{ c.grade }}</b><small>گریڈ</small></div>
+    <div><b>{% if c.position %}{{ c.position }} / {{ c.out_of }}{% else %}—{% endif %}</b><small>کلاس میں پوزیشن</small></div>
+    <div><b style="color:{{ '#15803d' if c.passed else '#c0392b' }}">{{ 'پاس' if c.passed else 'فیل' }}</b><small>نتیجہ</small></div>
+  </div>
+  <p>حاضری: <b>{{ c.att_present }}</b> / {{ c.att_total }} دن ({{ c.att_pct }}%)</p>
+  <div class="sig"><div>کلاس ٹیچر</div><div>دستخط سرپرست</div><div>{{ st.principal or 'مہتمم / پرنسپل' }}</div></div>
+</div>
+{% endfor %}
+{% endblock %}

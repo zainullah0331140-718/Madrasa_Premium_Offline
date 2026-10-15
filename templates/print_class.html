@@ -1,0 +1,11 @@
+{% extends 'print_base.html' %}{% import '_m.html' as m %}
+{% block title %}کلاس رپورٹ{% endblock %}
+{% block sheet %}<div class="sheet">
+  {{ m.letterhead(school) }}
+  <div class="doc-title">کلاس رپورٹ — {{ class_name }}</div>
+  {% if teacher %}<p>کلاس ٹیچر: <b>{{ teacher }}</b> &nbsp; طلبہ کی تعداد: <b>{{ students|length }}</b></p>{% endif %}
+  <table><tr><th>#</th><th>رول</th><th>نام</th><th>ولدیت</th><th>فون</th><th>حاصل</th><th>کل</th><th>فیصد</th><th>حاضری</th></tr>
+  {% for s in students %}<tr><td>{{ loop.index }}</td><td>{{ s.roll_number or s.id }}</td><td>{{ s.name }}</td><td>{{ s.father_name or '—' }}</td><td>{{ s.guardian_phone or s.phone or '—' }}</td><td>{{ s.obtained }}</td><td>{{ s.total }}</td><td>{{ ((s.obtained*100/s.total)|round(1)) if s.total else '—' }}</td><td>{{ s.present }}/{{ s.days }}</td></tr>
+  {% else %}<tr><td colspan="9" class="center">اس کلاس میں طلبہ درج نہیں</td></tr>{% endfor %}</table>
+  <div class="sig"><div>کلاس ٹیچر</div><div>{{ st.principal or 'مہتمم / پرنسپل' }}</div></div>
+</div>{% endblock %}

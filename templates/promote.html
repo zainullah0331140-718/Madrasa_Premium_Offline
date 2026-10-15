@@ -1,0 +1,21 @@
+{% extends 'base.html' %}{% import '_m.html' as m %}
+{% block title %}اگلی کلاس میں ترقی{% endblock %}
+{% block page_title %}طلبہ کی ترقی / کلاس تبدیلی{% endblock %}
+{% block content %}
+<section class="card">
+  <h3 class="card-title">{{ m.icon('layers') }} کلاس منتخب کریں</h3>
+  <form class="filters" method="get">{{ m.class_filter(classes, from_class, 'from_class', 'موجودہ کلاس', 'منتخب کریں') }}<button class="btn btn-dark">طلبہ دکھائیں</button></form>
+  {% if from_class %}
+  <form method="post" action="/students/promote">
+    <div class="filters">
+      <div class="fld"><label>کارروائی</label><select name="mode"><option value="move">نئی کلاس میں منتقل کریں</option><option value="graduate">فارغ التحصیل کریں</option></select></div>
+      <div class="fld"><label>نئی کلاس</label><input type="text" name="to_class" list="cl" placeholder="مثلاً: درجہ دوم"><datalist id="cl">{% for c in classes %}<option value="{{ c }}">{% endfor %}</datalist></div>
+    </div>
+    <div class="table-wrap"><table><thead><tr><th><input type="checkbox" onclick="document.querySelectorAll('.pick').forEach(c=>c.checked=this.checked)" checked></th><th>رول</th><th>نام</th><th>ولدیت</th></tr></thead><tbody>
+    {% for s in students %}<tr><td><input class="pick" type="checkbox" name="ids" value="{{ s.id }}" checked></td><td class="num">{{ s.roll_number or '—' }}</td><td>{{ s.name }}</td><td>{{ s.father_name }}</td></tr>{% else %}{{ m.empty_row(4) }}{% endfor %}</tbody></table></div>
+    <div class="note-info mt-s">ہر طالب علم کا پچھلا درجہ خود بخود "سابقہ درجہ" میں محفوظ ہو جائے گا۔ ریکارڈ حذف نہیں ہوتا۔</div>
+    <div class="mt"><button class="btn btn-primary btn-lg">{{ m.icon('check') }} لاگو کریں</button></div>
+  </form>
+  {% endif %}
+</section>
+{% endblock %}

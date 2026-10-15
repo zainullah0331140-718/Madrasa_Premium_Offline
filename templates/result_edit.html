@@ -1,0 +1,11 @@
+{% extends 'base.html' %}{% import '_m.html' as m %}
+{% block title %}رزلٹ کی ترمیم{% endblock %}
+{% block page_title %}رزلٹ کی ترمیم{% endblock %}
+{% block content %}
+<form class="card" method="post" action="/results/{{ r.id }}/edit"><div class="form-grid">
+  <div class="fld c-12"><label>طالب علم</label><select name="student_id">{% for s in students %}<option value="{{ s.id }}"{% if s.id == r.student_id %} selected{% endif %}>{{ s.name }} — {{ s.admission_class }}</option>{% endfor %}</select></div>
+  {{ m.field('امتحان کا نام', 'test_name', r.test_name, required=True, cls='c-6') }}{{ m.field('مضمون', 'subject', r.subject, cls='c-6') }}
+  {{ m.field('کل نمبر', 'total_marks', r.total_marks, type='number', required=True, cls='c-6') }}{{ m.field('حاصل کردہ نمبر', 'obtained_marks', r.obtained_marks, type='number', required=True, cls='c-6') }}
+  <div class="c-12 flex gap"><button class="btn btn-primary btn-lg">{{ m.icon('check') }} محفوظ کریں</button><a class="btn btn-lg" href="/results">منسوخ</a></div>
+</div></form>
+{% endblock %}

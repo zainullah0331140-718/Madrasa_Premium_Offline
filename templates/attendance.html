@@ -1,0 +1,27 @@
+{% extends 'base.html' %}{% import '_m.html' as m %}
+{% block title %}طلبہ کی حاضری{% endblock %}
+{% block page_title %}روزانہ حاضری{% endblock %}
+{% block content %}
+<section class="card">
+  <h3 class="card-title">{{ m.icon('check') }} حاضری شیٹ<span class="tools"><a class="btn btn-sm" href="/attendance/monthly?class_name={{ class_name|urlencode }}">ماہانہ رپورٹ</a></span></h3>
+  <form class="filters" method="get">
+    <div class="fld"><label>کلاس</label><select name="class_name">{% for c in classes %}<option{% if c==class_name %} selected{% endif %}>{{ c }}</option>{% endfor %}</select></div>
+    {{ m.field('تاریخ', 'day', day, type='date', cls='') }}
+    <button class="btn btn-dark">{{ m.icon('search') }} دکھائیں</button>
+  </form>
+  {% if not classes %}<div class="note-info">پہلے <a href="/students/new">طلبہ کا داخلہ</a> کریں تاکہ کلاس بن سکے۔</div>
+  {% else %}
+  <form method="post" action="/attendance/save">
+    <input type="hidden" name="class_name" value="{{ class_name }}"><input type="hidden" name="day" value="{{ day }}">
+    <div class="flex wrap gap mb"><button type="button" class="btn btn-sm" data-markall="حاضر (Present)">سب حاضر</button><button type="button" class="btn btn-sm" data-markall="غیر حاضر (Absent)">سب غیر حاضر</button>
+      {% if saved_count %}<span class="chip green">اس تاریخ کی حاضری پہلے سے درج ہے — دوبارہ محفوظ کرنے پر اپڈیٹ ہو گی</span>{% endif %}</div>
+    {% for s in students %}<div class="att-row">{{ m.avatar(s) }}<div><b>{{ s.name }}</b> <span class="muted small">ولد {{ s.father_name or '—' }} · رول {{ s.roll_number or '—' }}</span></div>
+      <div class="seg">{% set cur = existing.get(s.id, statuses[0]) %}
+        <label><input type="radio" name="st_{{ s.id }}" value="{{ statuses[0] }}"{% if cur == statuses[0] %} checked{% endif %}><span class="p">حاضر</span></label>
+        <label><input type="radio" name="st_{{ s.id }}" value="{{ statuses[1] }}"{% if cur == statuses[1] %} checked{% endif %}><span class="a">غیر حاضر</span></label>
+        <label><input type="radio" name="st_{{ s.id }}" value="{{ statuses[2] }}"{% if cur == statuses[2] %} checked{% endif %}><span class="l">چھٹی</span></label></div></div>
+    {% else %}<p class="empty muted center">اس کلاس میں کوئی فعال طالب علم نہیں</p>{% endfor %}
+    {% if students %}<div class="sticky-save"><button class="btn btn-primary btn-lg">{{ m.icon('check') }} حاضری محفوظ کریں</button></div>{% endif %}
+  </form>{% endif %}
+</section>
+{% endblock %}

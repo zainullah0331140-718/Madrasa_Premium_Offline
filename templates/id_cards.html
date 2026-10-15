@@ -1,0 +1,17 @@
+{% extends 'print_base.html' %}{% import '_m.html' as m %}
+{% block title %}شناختی کارڈ{% endblock %}
+{% block sheet %}
+<div class="cards-grid">
+{% for s in students %}
+<div class="idcard">
+  <div class="top"><span class="lg">{% if school.logo %}<img src="/static/{{ school.logo }}" alt="">{% else %}{{ m.icon('cap') }}{% endif %}</span><span><b>{{ school.name }}</b><small>{{ school.phone or '' }}</small></span></div>
+  <div class="mid">
+    <div class="ph">{% if s.photo %}<img src="/static/{{ s.photo }}" alt="">{% else %}{{ s.name[:1] }}{% endif %}</div>
+    <div><div class="nm">{{ s.name }}</div>
+    <dl><dt>ولدیت</dt><dd>{{ s.father_name or '—' }}</dd><dt>درجہ</dt><dd>{{ s.admission_class }}</dd><dt>رول نمبر</dt><dd>{{ s.roll_number or s.id }}</dd><dt>فون</dt><dd style="font-family:var(--font-ui)">{{ s.guardian_phone or s.phone or '—' }}</dd></dl></div>
+  </div>
+  <div class="bot"></div>
+</div>
+{% else %}<p class="center">کوئی طالب علم موجود نہیں</p>{% endfor %}
+</div>
+{% endblock %}
